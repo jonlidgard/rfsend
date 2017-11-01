@@ -74,8 +74,6 @@ static const Protocol proto[] = {
 
 const char *argp_program_version =
   "rfsend 1.0";
-const char *argp_program_bug_address =
-  "<jonlidgard@gmail.com>";
 
 /* Program documentation. */
 static char doc[] =
