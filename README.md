@@ -1,4 +1,4 @@
-Usage: rfsend [OPTION...] [COMMAND...]
+```Usage: rfsend [OPTION...] [COMMAND...]
 For Beaglebone Microcontrollers only.
 Sends a string of commands over RF to control RC5 type switches  
 
@@ -28,5 +28,6 @@ Ensure you have an appropriate cape loaded
   Protocol ID: 6 - HT6P20B (450us pulse timing)
 
   ** MUST BE RUN WITH ROOT PRIVILEGES **
+```
 
 See the wiki for more info:
