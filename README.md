@@ -21,9 +21,9 @@ rfsend uses one of these to create the pulse train for the 433mhz transmitter. T
 processor and are completely deterministic - making them great for doing timing critical
 tasks such as this.
 
-# Configuring linux to use the PRU
+## Configuring linux to use the PRU
 
-rfsend uses the Linux Userspace IO (UIO) method of communicating with the PRU's. Ensure
+rfsend uses the Linux Userspace I/O (UIO) method of communicating with the PRU's. Ensure
 you have this configured properly on your linux distribution. I'm using Debian 9.1
 with a 4.4.88-ti kernel. In order to use uio instead of the default rproc, modify your
 /boot/uEnv.txt as shown:
@@ -36,7 +36,7 @@ with a 4.4.88-ti kernel. In order to use uio instead of the default rproc, modif
 uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO-00A0.dtbo
 ```
 
-Reboot & do a ```lsmod | grep uio``` Check you get
+Reboot & do a ```lsmod | grep uio``` Check you get:
 ```
 uio_pruss               4629  0
 uio_pdrv_genirq         4243  0
@@ -44,6 +44,7 @@ uio                    11100  2 uio_pruss,uio_pdrv_genirq
 ```
 
 You will also need to load a cape to configure the Beaglebone pins.
+
 ```sudo sh -c "echo cape-universal > /sys/devices/platform/bone_capemgr/slots"```
 
 or, if you want it loaded at boot, add it to '/etc/default/capemgr':
@@ -72,7 +73,7 @@ Now ```cat /sys/devices/platform/bone_capemgr/slots``` - You should now see some
 (You might want to add that to a bootup script so the pin mode survives reboots.)
 
 
-# Sending the codes
+## Sending the codes
  
 ![Code Table](/images/codes.png)
 
@@ -91,9 +92,10 @@ Using a binary to decimal converter, the 'OFF' code for socket 1 is:
 For more information google the datasheet for the PT2260 chip used in the
 transmitter fob.
 
-# Example use
+## Example use
 The Mercury switches use a short pulse duration of 180us.
 So, based on codes from the above table
 
 ```sudo rfsend -t180 107396``` will turn off socket 1
+
 ```sudo rfsend -t180 107387``` will turn on socket 1
