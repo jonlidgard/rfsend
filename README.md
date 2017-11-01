@@ -1,4 +1,5 @@
-```Usage: rfsend [OPTION...] [COMMAND...]
+```
+Usage: rfsend [OPTION...] [COMMAND...]
 For Beaglebone Microcontrollers only.
 Sends a string of commands over RF to control RC5 type switches  
 

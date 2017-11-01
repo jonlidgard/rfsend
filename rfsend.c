@@ -73,7 +73,7 @@ static const Protocol proto[] = {
 
 
 const char *argp_program_version =
-  "rfsend 1.0";
+  "rfsend 1.1";
 
 /* Program documentation. */
 static char doc[] =
@@ -96,6 +96,7 @@ static char args_doc[] = "[COMMAND...]";
 static struct argp_option options[] = {
   {"debug", 'd', 0, 0, "Produce debug output" },
   {0,0,0,0, "" },
+  {"binary", 'b', 0, 0, "Command is in binary" },
   {"invert", 'i', 0, 0, "Invert signal" },
   {"repeat", 'r', "COUNT", OPTION_ARG_OPTIONAL,
    "Repeat the output COUNT (default 3) times"},
@@ -114,6 +115,7 @@ struct arguments
   uint32_t time;
   int debug;
   int invert;
+  int base;
   int repeat_count; 
   int protocol_id;
   int length;
@@ -130,6 +132,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
   switch (key)
     {
+    case 'b':
+      arguments->base = 2;
+      break;
     case 'd':
       arguments->debug = 1;
       break;
@@ -167,7 +172,6 @@ parse_opt (int key, char *arg, struct argp_state *state)
 static struct argp argp = { options, parse_opt, args_doc, doc };
 
 
-
 int main(int argc, char * argv[])
 {
   tpruss_intc_initdata prussIntCInitData = PRUSS_INTC_INITDATA;
@@ -185,6 +189,7 @@ int main(int argc, char * argv[])
   arguments.time = 0;
   arguments.length = 24;
   arguments.invert = -1;
+  arguments.base = 0;
   
   /* Parse our arguments; every option seen by parse_opt will
      be reflected in arguments. */
@@ -234,7 +239,8 @@ int main(int argc, char * argv[])
 
   for (i = 0; arguments.commands[i]; i++)
   {
-  prussDataRam->command = atoi(arguments.commands[i]);
+  
+  prussDataRam->command = strtoul(arguments.commands[i],NULL,arguments.base);
   prussDataRam->repeats = arguments.repeat_count;
 
   if (arguments.debug)
