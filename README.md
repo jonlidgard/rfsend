@@ -4,6 +4,7 @@ For Beaglebone Microcontrollers only.
 Sends a string of commands over RF to control RC5 type switches  
 
   -d, --debug                Produce debug output
+  -b, --binary               Command is in binary
   -i, --invert               Invert signal
   -l, --length[=BITS]        Command length (default 24) bits
   -p, --protocol[=ID]        Message protocol id (default 1)
