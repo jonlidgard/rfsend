@@ -1,7 +1,7 @@
 // rfsend.c
 // Send RF commands to devices using the common PT2260 / EV1527 protocols.
 //
-// Uses one of the built in 200MHZ Programmable Realtime Units (PRU's) 
+// Uses one of the built in 200MHZ Programmable Realtime Units (PRU's)
 // of the Sitara processor used on the Beaglebone series of Microcontrollers.
 // Based on work done for the Arduino with the rcswitch library.
 // (https://github.com/sui77/rc-switch)
@@ -73,7 +73,7 @@ static const Protocol proto[] = {
 
 
 const char *argp_program_version =
-  "rfsend 1.1";
+  "rfsend 1.2";
 
 /* Program documentation. */
 static char doc[] =
@@ -116,7 +116,7 @@ struct arguments
   int debug;
   int invert;
   int base;
-  int repeat_count; 
+  int repeat_count;
   int protocol_id;
   int length;
   char **commands;
@@ -153,10 +153,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	case 'l':
       arguments->length = arg ? atoi (arg) : 24;
 	  break;
-	      
+
     case ARGP_KEY_NO_ARGS:
       argp_usage (state);
-    
+
     case ARGP_KEY_ARG:
  	  arguments->commands = &state->argv[state->next-1];
       state->next = state->argc;
@@ -178,8 +178,8 @@ int main(int argc, char * argv[])
   PrussDataRam_t * prussDataRam;
   Message_t msg;
   int ret, i;
-  
-  
+
+
    struct arguments arguments;
 
   /* Default values. */
@@ -190,21 +190,21 @@ int main(int argc, char * argv[])
   arguments.length = 24;
   arguments.invert = -1;
   arguments.base = 0;
-  
+
   /* Parse our arguments; every option seen by parse_opt will
      be reflected in arguments. */
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
-  
-	
+
+
   // First, initialize the driver and open the kernel device
   prussdrv_init();
   ret = prussdrv_open(PRU_EVTOUT_0);
-  
+
   if(ret != 0) {
     printf("Failed to open PRUSS driver!\n");
-    return ret;
+    exit(ret);
   }
-    
+
   // Set up the interrupt mapping so we can wait on INTC later
   prussdrv_pruintc_init(&prussIntCInitData);
   // Map PRU DATARAM; reinterpret the pointer type as a pointer to
@@ -218,18 +218,18 @@ int main(int argc, char * argv[])
   msg.protocol = proto[arguments.protocol_id-1];
 
   uint32_t pulse_length = arguments.time * 100;
-  if (pulse_length == 0) 
+  if (pulse_length == 0)
     pulse_length = msg.protocol.pulseLength * 100; //nanoseconds/10
-  
+
   prussDataRam->syncHigh = msg.protocol.syncFactor[HIGH_PULSE] * pulse_length;
   prussDataRam->syncLow = msg.protocol.syncFactor[LOW_PULSE] * pulse_length;
 
   prussDataRam->zeroHigh = msg.protocol.zero[HIGH_PULSE] * pulse_length;
   prussDataRam->zeroLow = msg.protocol.zero[LOW_PULSE] * pulse_length;
-  
+
   prussDataRam->oneHigh = msg.protocol.one[HIGH_PULSE] * pulse_length;
   prussDataRam->oneLow = msg.protocol.one[LOW_PULSE] * pulse_length;
-  prussDataRam->length = arguments.length;  
+  prussDataRam->length = arguments.length;
   prussDataRam->result = 0;
 
   if (arguments.invert != -1)
@@ -239,14 +239,14 @@ int main(int argc, char * argv[])
 
   for (i = 0; arguments.commands[i]; i++)
   {
-  
+
   prussDataRam->command = strtoul(arguments.commands[i],NULL,arguments.base);
   prussDataRam->repeats = arguments.repeat_count;
 
   if (arguments.debug)
   {
     printf("Command: %d\n",prussDataRam->command);
-  }  
+  }
   // Memory fence: not strictly needed here, as compiler will insert
   // an implicit fence when prussdrv_exec_code(...) is called, but
   // a good habit to be in.
@@ -271,7 +271,7 @@ int main(int argc, char * argv[])
   // fence at prussdrv_pru_wait_event(...), but a good habit.
   __sync_synchronize();
   }
-  
+
   // Read the result returned by the PRU
   // Disable the PRU and exit; if we don't do this the PRU may
   // continue running after our program quits! The TI kernel driver
@@ -283,5 +283,5 @@ int main(int argc, char * argv[])
 
   prussdrv_exit();
 
-  exit(1);
+  exit(0);
 }
